@@ -1,52 +1,78 @@
 const choices = ["rock", "paper", "scissors"];
+let humanScore = 0;
+let computerScore = 0;
+const maxScore = 5;
 
 function getComputerChoice() {
     let result = choices[Math.floor(Math.random() * choices.length)];
     return result;
 }
 
-function getHumanChoice() {
-    let userChoice = prompt("Pick one of (rock, paper, scissors)").toLowerCase();
-    return userChoice;
-}
-
-let computerScore = 0;
-let humanScore = 0;
-
-function playRound() {
+function playRound(userChoice) {
     const computerSelection = getComputerChoice();
-    const humanSelection = getHumanChoice();
+    const humanSelection = userChoice;
+    let message = "";
 
     if(computerSelection == humanSelection) {
-        console.log("DRAW.. let's go again");
-        console.log(`Your score:${humanScore} Computer:${computerScore}`);
+        message = `DRAW.. let's go again 
+        Your score:${humanScore} Computer:${computerScore}`;
     } else if(
         (humanSelection === "rock" && computerSelection === "scissors") ||
         (humanSelection === "paper" && computerSelection === "rock") ||
         (humanSelection === "scissors" && computerSelection === "paper")
     ) {
-        console.log(`YOU WON. ${humanSelection} beats ${computerSelection}`);
         humanScore++;
-        console.log(`Your score:${humanScore} Computer:${computerScore}`);
+        message = `YOU WON. ${humanSelection} beats ${computerSelection} 
+        Your score:${humanScore} Computer:${computerScore}`;
     } else {
-        console.log(`Not your lucky day. ${computerSelection} beats ${humanSelection}`);
         computerScore++;
-        console.log(`Your score:${humanScore} Computer:${computerScore}`);
+        message = `Not your lucky day. ${computerSelection} beats ${humanSelection} 
+        Your score:${humanScore} Computer:${computerScore}`;
     }
+
+    resultDiv.textContent = message;
 }
 
-function playGame() {
-    for(let i = 0; i < 5; i++){
-        console.log(`--- ROUND ${i + 1} ---`);
-        playRound();
-    }
-
-    console.log("=== Final Result ===");
+function showFinalResult() {
+    let finalMessage = '';
     if (humanScore > computerScore) {
-        console.log(`You win the game! 🏆 (${humanScore} - ${computerScore})`);
+        finalMessage = `You win the game! 🏆 (${humanScore} - ${computerScore})`;
     } else if (humanScore < computerScore) {
-        console.log(`Computer wins the game! 🤖 (${computerScore} - ${humanScore})`);
+        finalMessage = `Computer wins the game! 🤖 (${computerScore} - ${humanScore})`;
     } else {
-        console.log(`It's a tie! (${humanScore} - ${computerScore})`);
+        finalMessage = `It's a tie! (${humanScore} - ${computerScore})`;
     }
+
+     resultDiv.textContent = finalMessage;
 }
+
+function resetGame() {
+    humanScore = 0;
+    computerScore = 0;
+    resultDiv.textContent = "";
+}
+
+const resultDiv = document.querySelector(".result");
+const buttonsDiv = document.querySelector(".buttonsDiv")
+const gameButtons = document.querySelectorAll(".oneRoundRock, .oneRoundPaper, .oneRoundScissors");
+const resetButton = document.createElement("button");
+resetButton.textContent = "Reset";
+
+gameButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    if (humanScore < maxScore && computerScore < maxScore) {
+        playRound(btn.value);
+
+        if (humanScore === maxScore || computerScore === maxScore) {
+            showFinalResult();
+            buttonsDiv.appendChild(resetButton);
+        }
+    }
+  });
+});
+
+resetButton.addEventListener("click", () => {
+    resetGame();
+    resetButton.remove();
+})
+
